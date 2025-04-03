@@ -1,0 +1,70 @@
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Folder, FileText, Search } from "lucide-react";
+
+const documents = [
+  { id: 1, title: "Guide des tests unitaires", category: "Unit Testing" },
+  { id: 2, title: "Bonnes pratiques CI/CD", category: "DevOps" },
+  { id: 3, title: "Stratégies de test logiciel", category: "Test Strategy" },
+];
+
+export default function DocumentLibrary() {
+  const [search, setSearch] = useState("");
+
+  const filteredDocs = documents.filter((doc) =>
+    doc.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="flex h-screen p-4 bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-1/4 p-4 bg-white rounded-2xl shadow-lg">
+        <h2 className="text-lg font-semibold mb-4">Catégories</h2>
+        <ul className="space-y-2">
+          <li className="flex items-center gap-2 text-blue-600 cursor-pointer">
+            <Folder /> Unit Testing
+          </li>
+          <li className="flex items-center gap-2 text-blue-600 cursor-pointer">
+            <Folder /> DevOps
+          </li>
+          <li className="flex items-center gap-2 text-blue-600 cursor-pointer">
+            <Folder /> Test Strategy
+          </li>
+        </ul>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Search className="text-gray-500" />
+          <Input
+            type="text"
+            placeholder="Rechercher un document..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          {filteredDocs.map((doc) => (
+            <Card key={doc.id} className="p-4">
+              <CardContent className="flex items-center gap-3">
+                <FileText className="text-blue-500" />
+                <div>
+                  <h3 className="text-lg font-semibold">{doc.title}</h3>
+                  <p className="text-sm text-gray-500">{doc.category}</p>
+                </div>
+              </CardContent>
+              <div className="mt-2 flex gap-2">
+                <Button variant="outline">Voir</Button>
+                <Button variant="default">Télécharger</Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
