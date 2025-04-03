@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Folder, FileText, Search } from "lucide-react";
 
 const documents = [
@@ -9,6 +6,18 @@ const documents = [
   { id: 2, title: "Bonnes pratiques CI/CD", category: "DevOps" },
   { id: 3, title: "Stratégies de test logiciel", category: "Test Strategy" },
 ];
+
+const Input = ({ type, placeholder, value, onChange }) => {
+  return (
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  );
+};
 
 export default function DocumentLibrary() {
   const [search, setSearch] = useState("");
@@ -49,19 +58,19 @@ export default function DocumentLibrary() {
 
         <div className="grid grid-cols-3 gap-4">
           {filteredDocs.map((doc) => (
-            <Card key={doc.id} className="p-4">
-              <CardContent className="flex items-center gap-3">
+            <div key={doc.id} className="p-4 bg-white rounded-lg shadow-md">
+              <div className="flex items-center gap-3">
                 <FileText className="text-blue-500" />
                 <div>
                   <h3 className="text-lg font-semibold">{doc.title}</h3>
                   <p className="text-sm text-gray-500">{doc.category}</p>
                 </div>
-              </CardContent>
-              <div className="mt-2 flex gap-2">
-                <Button variant="outline">Voir</Button>
-                <Button variant="default">Télécharger</Button>
               </div>
-            </Card>
+              <div className="mt-2 flex gap-2">
+                <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">Voir</button>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Télécharger</button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
