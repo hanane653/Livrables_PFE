@@ -1,13 +1,13 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0" version="26.2.6">
   <diagram name="Page-1" id="8378b5f6-a2b2-b727-a746-972ab9d02e00">
-    <mxGraphModel dx="1408" dy="748" grid="1" gridSize="10" guides="1" tooltips="1" connect="0" arrows="1" fold="1" page="1" pageScale="1.5" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+    <mxGraphModel dx="780" dy="468" grid="1" gridSize="10" guides="1" tooltips="1" connect="0" arrows="1" fold="1" page="1" pageScale="1.5" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="63" value="1" style="strokeColor=#DEEDFF;fillColor=#ADC3D9" parent="1" vertex="1">
           <mxGeometry x="86.5" y="380" width="40" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="64" value="Complete project execution" style="align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9" parent="1" vertex="1">
+        <mxCell id="64" value="Etude préalable " style="align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9" parent="1" vertex="1">
           <mxGeometry x="126.5" y="380" width="320" height="20" as="geometry" />
         </mxCell>
         <mxCell id="65" value="35 days" style="strokeColor=#DEEDFF;fillColor=#ADC3D9" parent="1" vertex="1">
