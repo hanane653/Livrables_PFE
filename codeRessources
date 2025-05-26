@@ -1,0 +1,328 @@
+// src/context/AuthContext.jsx
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios';
+
+const AuthContext = createContext(null);
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await axios.get('http://localhost:8089/auth/current-user', {
+        withCredentials: true
+      });
+      setUser(response.data);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (credentials) => {
+    try {
+      const response = await axios.post('http://localhost:8089/auth/login', credentials, {
+        withCredentials: true
+      });
+      setUser(response.data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await axios.post('http://localhost:8089/auth/logout', {}, {
+        withCredentials: true
+      });
+      setUser(null);
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
+// src/components/Login.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const userData = await login(credentials);
+      
+      // Vérifier le rôle de l'utilisateur et rediriger en conséquence
+      if (userData.role === 'ADMIN') {
+        navigate('/admin-dashboard');
+      } else if (userData.role === 'RESOURCE') {
+        navigate(`/resource-dashboard/${userData.id}`);
+      } else {
+        navigate('/home');
+      }
+    } catch (error) {
+      setError('Identifiants invalides');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Connexion
+          </h2>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <input
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                placeholder="Nom d'utilisateur"
+                value={credentials.username}
+                onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                placeholder="Mot de passe"
+                value={credentials.password}
+                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+            >
+              Se connecter
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+// src/components/ProtectedRoute.jsx
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+
+export default ProtectedRoute;
+// src/App.jsx
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './components/Login';
+import ResourceDashboard from './components/ResourceDashboard';
+import AdminDashboard from './components/AdminDashboard';
+import Unauthorized from './components/Unauthorized';
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
+          {/* Route pour le dashboard des ressources */}
+          <Route
+            path="/resource-dashboard/:resourceId"
+            element={
+              <ProtectedRoute allowedRoles={['RESOURCE']}>
+                <ResourceDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Route pour le dashboard admin */}
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          
+          {/* Redirection par défaut */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;
+// src/components/ResourceDashboard.jsx
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+
+const ResourceDashboard = () => {
+  const { resourceId } = useParams();
+  const { user } = useAuth();
+  const [resourceData, setResourceData] = useState(null);
+  const [demandes, setDemandes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchResourceData = async () => {
+      try {
+        // Vérifier que l'utilisateur accède à son propre dashboard
+        if (user.id !== parseInt(resourceId)) {
+          throw new Error('Accès non autorisé');
+        }
+
+        const [resourceResponse, demandesResponse] = await Promise.all([
+          axios.get(`http://localhost:8085/api/ressources/${resourceId}`),
+          axios.get(`http://localhost:8085/api/demandes/ressource/${resourceId}`)
+        ]);
+
+        setResourceData(resourceResponse.data);
+        setDemandes(demandesResponse.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResourceData();
+  }, [resourceId, user]);
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!resourceData) {
+    return <div>Ressource non trouvée</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h1 className="text-2xl font-bold mb-4">
+            Bienvenue, {resourceData.nom}
+          </h1>
+          <p className="text-gray-600">{resourceData.role}</p>
+        </div>
+
+        {/* Statistiques */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-2">Demandes en cours</h3>
+            <p className="text-3xl font-bold text-orange-600">
+              {demandes.filter(d => d.statut === 'EN_COURS').length}
+            </p>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-2">Demandes terminées</h3>
+            <p className="text-3xl font-bold text-green-600">
+              {demandes.filter(d => d.statut === 'TERMINEE').length}
+            </p>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-2">Demandes en attente</h3>
+            <p className="text-3xl font-bold text-yellow-600">
+              {demandes.filter(d => d.statut === 'EN_ATTENTE').length}
+            </p>
+          </div>
+        </div>
+
+        {/* Liste des demandes */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-4">Mes demandes</h2>
+          <div className="space-y-4">
+            {demandes.map((demande) => (
+              <div
+                key={demande.id}
+                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">{demande.titre}</h3>
+                    <p className="text-sm text-gray-500">{demande.description}</p>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${
+                      demande.statut === 'TERMINEE'
+                        ? 'bg-green-100 text-green-800'
+                        : demande.statut === 'EN_COURS'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {demande.statut}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ResourceDashboard;
