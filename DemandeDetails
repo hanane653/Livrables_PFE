@@ -56,6 +56,34 @@ const DemandeDetails = () => {
   const [occupationData, setOccupationData] = useState(null);
   const [stats, setStats] = useState(null);
 
+  // Fonction pour calculer l'occupation hebdomadaire
+  const calculateWeeklyOccupation = (demande) => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Commence lundi
+
+    const weeklyOccupation = Array(7).fill(0);
+    const dailyCharge = demande.chargePlanifiee / 5; // Charge quotidienne (5 jours ouvrables)
+
+    // Calcul de l'occupation pour chaque jour de la semaine
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(startOfWeek);
+      currentDate.setDate(startOfWeek.getDate() + i);
+
+      // Vérifier si la date est dans la période de la demande
+      if (currentDate >= new Date(demande.dateDebutPlanifiee) && 
+          currentDate <= new Date(demande.dateFinPlanifiee)) {
+        
+        // Ne pas compter les weekends
+        if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
+          weeklyOccupation[i] = dailyCharge;
+        }
+      }
+    }
+
+    return weeklyOccupation;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -68,14 +96,14 @@ const DemandeDetails = () => {
         const historiqueRes = await axios.get(`http://localhost:8084/api/demandes/${id}/historique`);
         setHistorique(historiqueRes.data);
 
-        // Récupération des données d'occupation
-        try {
-          const occupationRes = await axios.get(`http://localhost:8084/api/demandes/${id}/occupation`);
-          setOccupationData(occupationRes.data);
-        } catch (error) {
-          console.warn("Données d'occupation non disponibles:", error);
-          setOccupationData({ tauxOccupation: 0, occupationParJour: Array(7).fill(0) });
-        }
+        // Calcul de l'occupation hebdomadaire
+        const occupationParJour = calculateWeeklyOccupation(demandeRes.data);
+        const tauxOccupation = (demandeRes.data.chargePlanifiee / 5) * 100; // Taux d'occupation journalier
+
+        setOccupationData({
+          tauxOccupation: Math.min(tauxOccupation, 100), // Limiter à 100%
+          occupationParJour
+        });
 
         // Récupération des statistiques
         try {
