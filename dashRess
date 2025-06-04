@@ -20,12 +20,19 @@ import {
   FaUsers, FaClipboardList, FaTasks, FaChartLine, 
   FaSearch, FaBell, FaUserCircle, FaCog, FaSignOutAlt,
   FaHome, FaCalendarAlt, FaChartBar, FaChevronLeft, FaChevronRight,
-  FaChartPie
+  FaChartPie, FaTimes, FaProjectDiagram
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from "react-router-dom";
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import format from 'date-fns/format';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import getDay from 'date-fns/getDay';
+import fr from 'date-fns/locale/fr';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 // Enregistrement des composants Chart.js nécessaires
 ChartJS.register(
@@ -40,6 +47,19 @@ ChartJS.register(
   Legend,
   Filler
 );
+
+// Configuration du localisateur pour le calendrier
+const locales = {
+  'fr': fr,
+}
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
 
 const ResTest = () => {
   // États
@@ -56,7 +76,7 @@ const ResTest = () => {
   const [loading, setLoading] = useState(true);
   const [occupationData, setOccupationData] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const fetchResourceData = async () => {
@@ -77,6 +97,18 @@ const ResTest = () => {
         setResourceData(resourceResponse.data);
         setDemandes(demandesResponse.data);
         setOccupationData(occupationRes.data);
+
+        // Transformation des demandes en événements pour le calendrier
+        const calendarEvents = demandesResponse.data.map(demande => ({
+          id: demande.id_Demande,
+          title: demande.nomProjet,
+          start: new Date(demande.dateDebutPlanifiee),
+          end: new Date(demande.dateFinPlanifiee),
+          resource: demande,
+          color: getStatusColor(demande.statut)
+        }));
+
+        setEvents(calendarEvents);
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
       } finally {
@@ -225,6 +257,17 @@ const ResTest = () => {
                   demandes={demandes}
                   navigate={navigate}
                 />
+              </motion.div>
+            )}
+            {activeTab === 'calendar' && (
+              <motion.div
+                key="calendar"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <CalendarView events={events} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -573,5 +616,149 @@ const DemandesView = ({ demandes, navigate }) => (
   </div>
 );
 
+const CalendarView = ({ events }) => {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const eventStyleGetter = (event) => {
+    return {
+      style: {
+        backgroundColor: event.color,
+        borderRadius: '4px',
+        opacity: 0.8,
+        color: 'white',
+        border: '0px',
+        display: 'block'
+      }
+    };
+  };
+
+  const handleSelectEvent = (event) => {
+    setSelectedEvent(event);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+            <div className="h-8 w-1 bg-orange-500 rounded-full mr-3"></div>
+            Calendrier des demandes
+          </h2>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-sm text-gray-600">Terminée</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span className="text-sm text-gray-600">En cours</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <span className="text-sm text-gray-600">En attente</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-[600px]">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%' }}
+            eventPropGetter={eventStyleGetter}
+            onSelectEvent={handleSelectEvent}
+            messages={{
+              next: "Suivant",
+              previous: "Précédent",
+              today: "Aujourd'hui",
+              month: "Mois",
+              week: "Semaine",
+              day: "Jour",
+              agenda: "Agenda",
+              date: "Date",
+              time: "Heure",
+              event: "Événement",
+              noEventsInRange: "Aucun événement dans cette période"
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Modal pour les détails de l'événement */}
+      <AnimatePresence>
+        {selectedEvent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={() => setSelectedEvent(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl shadow-lg p-6 max-w-lg w-full mx-4"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-800">{selectedEvent.title}</h3>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <FaCalendarAlt className="text-orange-500" />
+                  <span className="text-gray-600">
+                    Du {format(selectedEvent.start, 'dd/MM/yyyy')} au {format(selectedEvent.end, 'dd/MM/yyyy')}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <FaChartBar className="text-orange-500" />
+                  <span className="text-gray-600">
+                    Charge planifiée: {selectedEvent.resource.chargePlanifiee} jours
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <FaProjectDiagram className="text-orange-500" />
+                  <span className="text-gray-600">
+                    Domaine: {selectedEvent.resource.nomDomaine}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <FaTasks className="text-orange-500" />
+                  <span className="text-gray-600">
+                    Statut: {selectedEvent.resource.statut}
+                  </span>
+                </div>
+                <p className="text-gray-600 mt-4">{selectedEvent.resource.description}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Fonction pour obtenir la couleur en fonction du statut
+const getStatusColor = (statut) => {
+  switch (statut) {
+    case 'TERMINEE':
+      return '#22c55e'; // vert
+    case 'EN_COURS':
+      return '#3b82f6'; // bleu
+    case 'EN_ATTENTE':
+      return '#eab308'; // jaune
+    default:
+      return '#6b7280'; // gris
+  }
+};
 
 export default ResTest;
