@@ -1,0 +1,117 @@
+✅ Étapes Complètes :
+📁 Structure du projet
+bash
+Copier
+Modifier
+rag_chatbot/
+├── app.py                  # Flask API
+├── rag_utils.py            # Embeddings, FAISS, modèle
+├── documents/              # Tes fichiers .txt ou .pdf
+└── index_store/            # Persisted FAISS index
+📄 rag_utils.py
+python
+Copier
+Modifier
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.docstore.document import Document
+from sentence_transformers import SentenceTransformer
+import os
+
+# Créer les embeddings
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+# Charger et indexer les documents
+def build_vectorstore(doc_texts, persist_dir="index_store"):
+    texts = [Document(page_content=t) for t in doc_texts]
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+    docs = text_splitter.split_documents(texts)
+    db = FAISS.from_documents(docs, embedding_model)
+    db.save_local(persist_dir)
+    return db
+
+# Récupérer la base existante
+def load_vectorstore(persist_dir="index_store"):
+    return FAISS.load_local(persist_dir, embedding_model)
+
+# Chargement LLM
+def load_llm():
+    model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(model_id, device_map="auto")
+    return pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=300)
+📄 app.py
+python
+Copier
+Modifier
+from flask import Flask, request, jsonify
+from rag_utils import load_vectorstore, load_llm
+import torch
+
+app = Flask(__name__)
+
+# Charger FAISS et modèle
+vectorstore = load_vectorstore()
+generator = load_llm()
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    query = request.json.get("question")
+    docs = vectorstore.similarity_search(query, k=2)
+    context = "\n".join([doc.page_content for doc in docs])
+    
+    prompt = f"Contexte : {context}\nQuestion : {query}\nRéponse :"
+    response = generator(prompt)[0]["generated_text"]
+
+    return jsonify({"response": response})
+
+if __name__ == "__main__":
+    app.run(debug=True)
+📄 Exemple de script d’indexation (facultatif)
+python
+Copier
+Modifier
+# create_index.py
+import os
+from rag_utils import build_vectorstore
+
+# Exemple de corpus
+with open("documents/testing_intro.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+
+build_vectorstore([content])
+print("Index créé avec succès.")
+🚀 Exécution
+Indexe les documents :
+
+bash
+Copier
+Modifier
+python create_index.py
+Lance le serveur Flask :
+
+bash
+Copier
+Modifier
+python app.py
+Interroge l’API via Postman ou curl :
+
+bash
+Copier
+Modifier
+curl -X POST http://127.0.0.1:5000/chat -H "Content-Type: application/json" -d '{"question":"C’est quoi le test logiciel ?"}'
+huggingface-cli login
+Puis entre ton token d’accès Hugging Face (tu peux le générer sur https://huggingface.co/settings/tokens).
+
+Ensuite, dans ton code Python, ajoute :
+
+python
+Copier
+Modifier
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=True)
+model = AutoModelForCausalLM.from_pretrained(model_id, use_auth_token=True)
