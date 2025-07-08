@@ -1,0 +1,77 @@
+Parfait ! Voici une version enrichie du **cahier de tests fonctionnels** pour le portail de gestion du Software Testing avec :
+
+* **ID scénario**
+* **Titre du scénario**
+* **Description du scénario**
+
+---
+
+## ✅ MODULE 1 : Gestion des demandes de tests
+
+| ID Scénario | Titre du scénario                     | Description                                                                                                       |
+| ----------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| SC-DT-01    | Création d'une demande                | L'utilisateur remplit le formulaire de demande avec des informations valides et le soumet avec succès.            |
+| SC-DT-02    | Création avec champs vides            | L'utilisateur tente de soumettre une demande sans remplir les champs obligatoires. Un message d'erreur s'affiche. |
+| SC-DT-03    | Modification d’une demande            | L'utilisateur sélectionne une demande existante, modifie certains champs et enregistre les changements.           |
+| SC-DT-04    | Affectation d’une demande             | Le responsable affecte une ressource à une demande en attente.                                                    |
+| SC-DT-05    | Consultation de la liste des demandes | L'utilisateur consulte la liste des demandes avec pagination, tri et filtres.                                     |
+| SC-DT-06    | Notification lors d’une soumission    | Après création d’une demande, une notification est affichée au demandeur ou au responsable.                       |
+
+---
+
+## ✅ MODULE 2 : Authentification & gestion des utilisateurs
+
+| ID Scénario | Titre du scénario                 | Description                                                                                                         |
+| ----------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| SC-AU-01    | Connexion réussie                 | L'utilisateur se connecte avec identifiants valides et accède à l’interface principale.                             |
+| SC-AU-02    | Connexion échouée                 | L'utilisateur entre un mauvais mot de passe et reçoit un message d’erreur.                                          |
+| SC-AU-03    | Redirection par rôle              | L’utilisateur est redirigé vers un tableau de bord personnalisé selon son rôle (admin, responsable, testeur, etc.). |
+| SC-AU-04    | Accès route protégée non connecté | Un utilisateur non authentifié tente d’accéder à une page protégée et est redirigé vers la page de connexion.       |
+| SC-AU-05    | Déconnexion                       | L'utilisateur clique sur « Se déconnecter » et retourne à la page de login.                                         |
+
+---
+
+## ✅ MODULE 3 : Bibliothèque documentaire
+
+| ID Scénario | Titre du scénario             | Description                                                                                           |
+| ----------- | ----------------------------- | ----------------------------------------------------------------------------------------------------- |
+| SC-BD-01    | Upload d’un fichier PDF       | L'utilisateur charge un fichier PDF via un formulaire et voit la confirmation de l’upload.            |
+| SC-BD-02    | Consultation d’un document    | L’utilisateur clique sur un document et le visualise dans un viewer intégré ou en téléchargement.     |
+| SC-BD-03    | Recherche par mot-clé         | L'utilisateur saisit un mot-clé dans la barre de recherche et obtient une liste filtrée.              |
+| SC-BD-04    | Filtrage par type de document | L’utilisateur sélectionne un filtre (PV, rapport, plan de test) et voit les résultats correspondants. |
+| SC-BD-05    | Suppression d’un document     | Un administrateur supprime un document après confirmation.                                            |
+| SC-BD-06    | Accès refusé à un document    | Un utilisateur non autorisé tente d'accéder à un fichier restreint et reçoit un message d’erreur.     |
+
+---
+
+## ✅ MODULE 4 : Chatbot RAG
+
+| ID Scénario | Titre du scénario             | Description                                                                                                      |
+| ----------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| SC-CB-01    | Poser une question au chatbot | L’utilisateur écrit une question sur les processus de test, et le chatbot lui répond.                            |
+| SC-CB-02    | Réponse basée sur un document | Le chatbot interroge la base documentaire et affiche une réponse avec lien vers la source.                       |
+| SC-CB-03    | Question hors domaine         | L’utilisateur pose une question qui ne concerne pas le testing, et le chatbot répond qu’il ne peut pas répondre. |
+| SC-CB-04    | Accès au chatbot sans login   | Un utilisateur non connecté essaie d’utiliser le chatbot : accès refusé.                                         |
+| SC-CB-05    | Suggestion de document        | Le chatbot propose un document utile en plus de la réponse.                                                      |
+
+---
+
+## ✅ MODULE 5 : Dashboard & Statistiques
+
+| ID Scénario | Titre du scénario                | Description                                                                                             |
+| ----------- | -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| SC-DS-01    | Affichage des indicateurs        | Les KPI (nombre de demandes, temps moyen, statuts) s’affichent correctement au chargement du dashboard. |
+| SC-DS-02    | Mise à jour en temps réel        | L’ajout/modification d’une demande met à jour les statistiques instantanément.                          |
+| SC-DS-03    | Filtrage par statut/date         | L’utilisateur filtre les statistiques par mois, statut ou type de test.                                 |
+| SC-DS-04    | Accès restreint aux statistiques | Certains indicateurs ne sont visibles que pour les responsables et administrateurs.                     |
+
+---
+
+Souhaites-tu maintenant que je te regroupe tout ça dans **un tableau Excel ou Word prêt à remplir pendant les tests** ? Ou tu veux que je t’ajoute les colonnes suivantes aussi :
+
+* Jeux de données
+* Résultat attendu
+* Résultat observé
+* Statut (✅/❌)
+
+?
