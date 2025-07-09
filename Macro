@@ -1,0 +1,18 @@
+Sub ajouter_ligne()
+    Dim lastRow As Long
+    Dim ws As Worksheet
+    Set ws = ActiveSheet
+    
+    ' Trouver la dernière ligne utilisée dans la colonne A
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+
+    ' Insérer une nouvelle ligne sous la dernière ligne utilisée
+    ws.Rows(lastRow + 1).Insert Shift:=xlDown
+
+    ' Copier la mise en forme de la ligne précédente
+    ws.Rows(lastRow).Copy
+    ws.Rows(lastRow + 1).PasteSpecial xlPasteFormats
+    ws.Rows(lastRow + 1).PasteSpecial xlPasteFormulas
+
+    Application.CutCopyMode = False
+End Sub
