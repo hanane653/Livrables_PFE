@@ -13,3 +13,129 @@ Ce guide présente de manière structurée et détaillée :
 * et les modalités de **déploiement** local ou conteneurisé.
 
 L’objectif est de garantir une **prise en main rapide**, une **reproductibilité** du déploiement, et de **faciliter la maintenance** de la plateforme dans un contexte professionnel. Une attention particulière a été portée à la clarté, la cohérence des configurations, et l’adaptabilité à différents environnements techniques (Linux, Windows, Docker, etc.).
+## 📖 Introduction
+
+Le présent document constitue le **guide d’installation et de mise en œuvre technique** du portail de gestion du software testing développé dans le cadre d’un projet de fin d’études au sein d’**Attijariwafa Bank**. Il s’adresse principalement aux membres des équipes **DSA**, **intégration**, **production**, ou toute autre entité amenée à déployer, configurer ou maintenir la solution dans un environnement réel.
+
+Ce portail, basé sur une **architecture microservices**, a pour objectif de faciliter la gestion des demandes de test, la documentation associée, le suivi via un tableau de bord, ainsi que l’intégration d’un **chatbot intelligent** pour l’assistance fonctionnelle. Le projet repose sur des technologies modernes telles que **Spring Boot**, **React**, **Keycloak**, **PostgreSQL** et **Python (LangChain)**.
+
+Ce guide présente de manière structurée et détaillée :
+
+* les **technologies et outils** utilisés, avec leurs versions spécifiques ;
+* les **pré-requis techniques** nécessaires à l’installation ;
+* les **étapes d’installation** pour chaque composant du portail (backend, frontend, authentification, base de données, chatbot) ;
+* les procédures de **test automatisé** ;
+* et les modalités de **déploiement** local ou conteneurisé.
+
+L’objectif est de garantir une **prise en main rapide**, une **reproductibilité** du déploiement, et de **faciliter la maintenance** de la plateforme dans un contexte professionnel. Une attention particulière a été portée à la clarté, la cohérence des configurations, et l’adaptabilité à différents environnements techniques (Linux, Windows, Docker, etc.).
+
+---
+
+## 🛠️ Outils et technologies utilisés
+
+| Composant        | Technologie / Outil              | Version       |
+| ---------------- | -------------------------------- | ------------- |
+| Backend          | Spring Boot                      | 3.1.2         |
+| Frontend         | React.js + Vite                  | React 18.2.0  |
+| Authentification | Keycloak                         | 22.0.1        |
+| Base de données  | PostgreSQL                       | 15.3          |
+| Chatbot          | Python, LangChain                | 0.2.0         |
+| Automatisation   | Robot Framework, SeleniumLibrary | 6.1.1 / 6.0.0 |
+| Outils DevOps    | Git, GitLab CI/CD                | -             |
+| Conteneurisation | Docker, Docker Compose           | Docker 24.0+  |
+| IDEs recommandés | IntelliJ IDEA, VS Code           | -             |
+| Navigateur ciblé | Google Chrome                    | 114+          |
+
+---
+
+## ⚙️ Guide d'installation
+
+### 1. Pré-requis système général
+
+* OS : Linux Ubuntu 22.04 / Windows 10+ / MacOS
+* Java JDK 17+ installé et configuré (`JAVA_HOME`)
+* Node.js v18+ et npm installés
+* Python 3.10+ avec `pip` installé
+* Docker et Docker Compose installés
+* PostgreSQL installé ou accessible
+* Navigateur Chrome installé
+
+### 2. Clonage du projet
+
+```bash
+git clone https://gitlab.com/mon-projet/software-testing-portal.git
+cd software-testing-portal
+```
+
+### 3. Installation Backend (Spring Boot)
+
+```bash
+cd backend
+./mvnw clean install
+java -jar target/backend-0.0.1-SNAPSHOT.jar
+```
+
+> ⚠️ Assurez-vous que la base de données PostgreSQL est lancée avec le bon schéma et les bonnes variables d’environnement.
+
+### 4. Installation Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+> 📍 L’application sera disponible sur `http://localhost:5173`
+
+### 5. Déploiement Keycloak
+
+#### A. Démarrage via Docker Compose
+
+```bash
+cd keycloak
+docker-compose up -d
+```
+
+#### B. Import du realm et des clients
+
+* Accédez à `http://localhost:8080`
+* Connectez-vous avec `admin/admin`
+* Importez le fichier `realm-export.json`
+
+### 6. Configuration de la base de données PostgreSQL
+
+```bash
+psql -U postgres
+CREATE DATABASE software_testing;
+\c software_testing
+-- Exécutez le script schema.sql pour créer les tables
+```
+
+### 7. Installation du Chatbot (Python + LangChain)
+
+```bash
+cd chatbot
+pip install -r requirements.txt
+python main.py
+```
+
+### 8. Lancement global avec Docker (optionnel)
+
+```bash
+docker-compose -f docker-compose.full.yml up --build
+```
+
+> 🧠 Cette commande déploie tous les services (backend, frontend, keycloak, postgres, chatbot) dans des conteneurs.
+
+### 9. Tests automatisés
+
+```bash
+cd tests
+robot tests_automatises.robot
+```
+
+> 🔍 Les résultats sont générés dans `reports/`
+
+---
+
+Ce guide est conçu pour garantir un déploiement sans friction et une évolutivité future. Pour toute anomalie, veuillez contacter l’équipe technique responsable ou ouvrir un ticket via l’espace GitLab du projet.
