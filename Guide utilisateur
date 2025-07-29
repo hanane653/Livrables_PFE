@@ -1,0 +1,15 @@
+## 📖 Introduction
+
+Le présent document constitue le **guide d’installation et de mise en œuvre technique** du portail de gestion du software testing développé dans le cadre d’un projet de fin d’études au sein d’**Attijariwafa Bank**. Il s’adresse principalement aux membres des équipes **DSA**, **intégration**, **production**, ou toute autre entité amenée à déployer, configurer ou maintenir la solution dans un environnement réel.
+
+Ce portail, basé sur une **architecture microservices**, a pour objectif de faciliter la gestion des demandes de test, la documentation associée, le suivi via un tableau de bord, ainsi que l’intégration d’un **chatbot intelligent** pour l’assistance fonctionnelle. Le projet repose sur des technologies modernes telles que **Spring Boot**, **React**, **Keycloak**, **PostgreSQL** et **Python (LangChain)**.
+
+Ce guide présente de manière structurée et détaillée :
+
+* les **technologies et outils** utilisés, avec leurs versions spécifiques ;
+* les **pré-requis techniques** nécessaires à l’installation ;
+* les **étapes d’installation** pour chaque composant du portail (backend, frontend, authentification, base de données, chatbot) ;
+* les procédures de **test automatisé** ;
+* et les modalités de **déploiement** local ou conteneurisé.
+
+L’objectif est de garantir une **prise en main rapide**, une **reproductibilité** du déploiement, et de **faciliter la maintenance** de la plateforme dans un contexte professionnel. Une attention particulière a été portée à la clarté, la cohérence des configurations, et l’adaptabilité à différents environnements techniques (Linux, Windows, Docker, etc.).
