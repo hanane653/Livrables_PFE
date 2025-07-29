@@ -139,3 +139,127 @@ robot tests_automatises.robot
 ---
 
 Ce guide est conçu pour garantir un déploiement sans friction et une évolutivité future. Pour toute anomalie, veuillez contacter l’équipe technique responsable ou ouvrir un ticket via l’espace GitLab du projet.
+Très bien. Voici un exemple structuré et professionnel pour un **guide d'installation détaillé**, incluant la **description complète de chaque outil utilisé** dans le développement et le déploiement de votre **portail de gestion du software testing**. Le texte est pensé pour être inséré dans une section du guide destinée à l’équipe d’intégration (DSA, etc.).
+
+---
+
+## 📦 Outils de développement et technologies utilisées
+
+Cette section présente les outils utilisés dans la conception, le développement, les tests, la gestion de version et le déploiement du portail. Chaque outil est décrit avec précision afin de faciliter la compréhension, la maintenance et l’intégration du projet.
+
+---
+
+### 1. 🔧 **Backend – Spring Boot**
+
+* **Version :** 3.2.2
+* **Description :** Spring Boot est un framework Java open-source qui simplifie la création d’applications autonomes basées sur Spring. Il permet un démarrage rapide avec une configuration minimale. Utilisé ici pour développer des microservices RESTful robustes, avec intégration de Spring Security et gestion centralisée de la configuration.
+* **Utilisation :**
+
+  * Définition des API REST.
+  * Traitements métier liés aux demandes, utilisateurs et bibliothèques.
+  * Intégration sécurisée via JWT et Keycloak.
+  * Communication inter-services via REST.
+
+---
+
+### 2. 🎨 **Frontend – React.js**
+
+* **Version :** 18.2.0
+* **Description :** React.js est une bibliothèque JavaScript développée par Meta, utilisée pour créer des interfaces utilisateur dynamiques et réactives. Elle favorise la création de composants modulaires, facilitant la maintenabilité du code.
+* **Utilisation :**
+
+  * Interface graphique du portail (tableaux, formulaires, dashboard).
+  * Interaction utilisateur avec les API via Axios.
+  * Utilisation de Tailwind CSS pour le design.
+  * Intégration d’animations et de composants interactifs.
+
+---
+
+### 3. 🎨 **Tailwind CSS**
+
+* **Version :** 3.3.2
+* **Description :** Framework CSS utilitaire qui permet de construire rapidement des interfaces modernes sans quitter le fichier HTML/JSX.
+* **Utilisation :**
+
+  * Conception du design responsive.
+  * Harmonisation visuelle entre les pages.
+  * Facilitation de la maintenance des styles via des classes prédéfinies.
+
+---
+
+### 4. 🔐 **Keycloak**
+
+* **Version :** 22.0.1
+* **Description :** Keycloak est un serveur open-source de gestion des identités et des accès (IAM). Il permet l’authentification, la gestion des rôles, l’autorisation et la fédération des identités.
+* **Utilisation :**
+
+  * Authentification des utilisateurs.
+  * Gestion des rôles (admin, testeur, manager...).
+  * Génération et validation de tokens JWT.
+  * Intégration avec Spring Security via OIDC.
+
+---
+
+### 5. 💽 **Base de données – PostgreSQL**
+
+* **Version :** 15
+* **Description :** PostgreSQL est un système de gestion de base de données relationnelle open-source puissant, fiable et respectueux des standards SQL.
+* **Utilisation :**
+
+  * Stockage des données des utilisateurs, demandes, documents, logs, etc.
+  * Intégration avec Spring Data JPA pour la manipulation des entités.
+
+---
+
+### 6. 🧪 **Robot Framework**
+
+* **Version :** 7.0 + SeleniumLibrary
+* **Description :** Robot Framework est un framework open-source pour les tests d’acceptation et les tests end-to-end, basé sur une syntaxe en mots-clés. Il est extensible avec des bibliothèques tierces comme SeleniumLibrary pour l’automatisation web.
+* **Utilisation :**
+
+  * Exécution de tests fonctionnels automatisés.
+  * Vérification de l’affichage des données, de la navigation et de la sécurité.
+  * Génération de rapports de test.
+
+---
+
+### 7. 🧰 **Postman**
+
+* **Version :** v10.20
+* **Description :** Postman est un outil populaire pour tester des API REST. Il permet de faire des requêtes HTTP, de gérer des collections et d'automatiser des scénarios de test.
+* **Utilisation :**
+
+  * Tests des endpoints REST des microservices.
+  * Simulation de scénarios de création, modification, suppression de ressources.
+  * Test de la sécurité via l’ajout de tokens d’authentification.
+
+---
+
+### 8. 🛠️ **Docker (en option pour la suite)**
+
+* **Version :** 24.0.6
+* **Description :** Docker est une plateforme de virtualisation légère permettant de packager et de distribuer des applications dans des conteneurs.
+* **Utilisation (prévue pour déploiement final) :**
+
+  * Conteneurisation des microservices.
+  * Déploiement simplifié dans tout environnement (DSA, production).
+  * Création de fichiers `Dockerfile` et `docker-compose.yml` pour chaque service.
+
+---
+
+### 9. 🗃️ **Git & GitHub**
+
+* **Versions :**
+
+  * Git : 2.42.0
+  * GitHub (dépôt en ligne)
+* **Description :** Git est un système de gestion de version décentralisé. GitHub héberge les dépôts en ligne et permet la collaboration, le suivi des issues, et l’intégration continue.
+* **Utilisation :**
+
+  * Suivi de version du code source.
+  * Branching, pull requests, et revue de code.
+  * Collaboration entre les développeurs.
+
+---
+
+Souhaitez-vous que je vous prépare aussi une **introduction pour ce guide**, et ensuite le **guide d'installation pas à pas (backend, frontend, base de données, etc.)** ?
